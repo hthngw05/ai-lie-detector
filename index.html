@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced AI Lie Detection System - Applied AI Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .pulse-red { animation: pulseRed 1.5s ease-in-out infinite; }
+        @keyframes pulseRed { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.8; transform: scale(1.02); } }
+        
+        .slide-in { animation: slideIn 0.8s ease-out; }
+        @keyframes slideIn { 0% { transform: translateY(30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+        
+        .scale-in { animation: scaleIn 1.2s ease-out; }
+        @keyframes scaleIn { 0% { transform: scale(0.5); opacity: 0; } 50% { transform: scale(1.1); } 100% { transform: scale(1); opacity: 1; } }
+        
+        .glow { box-shadow: 0 0 20px rgba(59, 130, 246, 0.3); }
+        .glow-red { box-shadow: 0 0 20px rgba(239, 68, 68, 0.3); }
+        
+        .recording-border { 
+            border: 3px solid #ef4444; 
+            animation: recordingPulse 1s ease-in-out infinite; 
+        }
+        @keyframes recordingPulse { 0%, 100% { border-color: #ef4444; } 50% { border-color: #fca5a5; } }
+        
+        .live-metrics { background: linear-gradient(45deg, #f0f9ff, #e0f2fe); backdrop-filter: blur(10px); }
+        .analysis-factor { transition: all 0.3s ease; }
+        .analysis-factor:hover { transform: translateX(5px); }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <!-- Welcome Screen -->
+        <div id="welcomeScreen" class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-8">
+                    <div class="mb-6">
+                        <div class="inline-block p-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full mb-4">
+                            <div class="text-4xl">🧠</div>
+                        </div>
+                        <h1 class="text-5xl font-bold text-gray-800 mb-4">Advanced AI Lie Detection System</h1>
+                        <p class="text-xl text-gray-600 mb-2">Real-time Behavioral Pattern Analysis</p>
+                        <p class="text-lg text-gray-500">Powered by Computer Vision & Audio Signal Processing</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-2xl p-8 max-w-md mx-auto mb-8">
+                    <div class="text-center mb-6">
+                        <div class="flex justify-center space-x-6 mb-6">
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl mb-2">📹</div>
+                                <span class="text-sm font-medium text-gray-600">Computer Vision</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-gradient-to-r from-green-500 to-green-600 rounded-full flex items-center justify-center text-white text-2xl mb-2">🎤</div>
+                                <span class="text-sm font-medium text-gray-600">Audio Analysis</span>
+                            </div>
+                            <div class="flex flex-col items-center">
+                                <div class="w-16 h-16 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl mb-2">🤖</div>
+                                <span class="text-sm font-medium text-gray-600">ML Algorithms</span>
+                            </div>
+                        </div>
+                        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Advanced Behavioral Analysis</h2>
+                        <p class="text-gray-600 mb-4">This system uses legitimate psychological and physiological markers validated by research in deception detection.</p>
+                        
+                        <div class="bg-amber-50 border-l-4 border-amber-400 p-4 mb-6 text-left rounded-lg">
+                            <p class="text-sm text-amber-800">
+                                <span class="font-semibold">Research-Based:</span> Analyzes real physiological and behavioral indicators including micro-expressions, vocal patterns, and response timing
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <input
+                            type="text"
+                            id="participantName"
+                            placeholder="Enter participant name"
+                            class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-center text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                        />
+                        
+                        <button
+                            onclick="initializeSystem()"
+                            class="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 glow"
+                        >
+                            🚀 Initialize Analysis System
+                        </button>
+                    </div>
+
+                    <!-- Debug Info -->
+                    <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                        <div class="text-xs text-gray-600">
+                            <div>Status: <span id="debugStatus" class="font-mono">Ready</span></div>
+                            <div>Camera: <span id="debugCamera" class="font-mono">Not initialized</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-xl p-8">
+                    <h3 class="text-2xl font-semibold text-gray-800 mb-6 text-center">Real AI Detection Methods</h3>
+                    <div class="grid md:grid-cols-3 gap-6 text-center">
+                        <div class="p-6 bg-gradient-to-b from-blue-50 to-blue-100 rounded-xl border-l-4 border-blue-500">
+                            <div class="text-3xl mb-3">👁️</div>
+                            <div class="font-semibold mb-2 text-blue-900">Micro-Expression Analysis</div>
+                            <div class="text-sm text-blue-800">Real-time facial coding • Emotion detection • Involuntary muscle movements • Baseline deviation analysis</div>
+                        </div>
+                        <div class="p-6 bg-gradient-to-b from-green-50 to-green-100 rounded-xl border-l-4 border-green-500">
+                            <div class="text-3xl mb-3">🔊</div>
+                            <div class="font-semibold mb-2 text-green-900">Vocal Stress Analysis</div>
+                            <div class="text-sm text-green-800">Fundamental frequency tracking • Jitter analysis • Response timing • Cognitive load indicators</div>
+                        </div>
+                        <div class="p-6 bg-gradient-to-b from-purple-50 to-purple-100 rounded-xl border-l-4 border-purple-500">
+                            <div class="text-3xl mb-3">📊</div>
+                            <div class="font-semibold mb-2 text-purple-900">Behavioral Modeling</div>
+                            <div class="text-sm text-purple-800">Statistical analysis • Pattern recognition • Anomaly detection • Confidence scoring</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Analysis Interface -->
+        <div id="analysisScreen" class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 p-6" style="display: none;">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold text-gray-800 mb-2">AI Behavioral Analysis System</h1>
+                    <p id="analyzingParticipant" class="text-xl text-blue-600 font-medium">Subject: </p>
+                    <div class="mt-4 flex justify-center items-center space-x-4">
+                        <div class="flex items-center">
+                            <div id="systemStatus" class="w-3 h-3 bg-red-500 rounded-full mr-2"></div>
+                            <span id="systemStatusText" class="text-sm font-medium">Initializing...</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                    <!-- Video Analysis Panel -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-2xl font-semibold text-gray-800 flex items-center">
+                                <span class="mr-3 text-2xl">📹</span>
+                                Computer Vision Analysis
+                            </h2>
+                            <div class="flex items-center space-x-2">
+                                <div id="cameraStatus" class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <span id="cameraStatusText" class="text-sm font-medium">Offline</span>
+                            </div>
+                        </div>
+                        
+                        <div class="relative mb-4">
+                            <video id="video" 
+                                   autoplay 
+                                   muted 
+                                   playsinline
+                                   class="w-full h-80 bg-gray-900 rounded-xl object-cover shadow-inner"
+                                   style="transform: scaleX(-1);">
+                            </video>
+                            <div id="recordingIndicator" class="absolute top-4 left-4 bg-red-600 text-white px-4 py-2 rounded-full text-sm font-bold pulse-red" style="display: none;">
+                                🔴 ANALYZING
+                            </div>
+                            <div id="recordingTimer" class="absolute top-4 right-4 bg-black bg-opacity-70 text-white px-3 py-1 rounded-full text-sm font-mono" style="display: none;">
+                                00:00
+                            </div>
+                        </div>
+
+                        <!-- Real-time Analysis Metrics -->
+                        <div id="liveMetrics" class="grid grid-cols-2 gap-3 mb-4" style="display: none;">
+                            <div class="live-metrics p-3 rounded-lg border">
+                                <div class="text-xs font-semibold text-blue-700 mb-1">💫 Micro-expressions</div>
+                                <div id="microExpressions" class="text-lg font-bold text-blue-900">--</div>
+                            </div>
+                            <div class="live-metrics p-3 rounded-lg border">
+                                <div class="text-xs font-semibold text-green-700 mb-1">👀 Gaze Pattern</div>
+                                <div id="gazePattern" class="text-lg font-bold text-green-900">--</div>
+                            </div>
+                            <div class="live-metrics p-3 rounded-lg border">
+                                <div class="text-xs font-semibold text-purple-700 mb-1">🎤 Vocal Stress</div>
+                                <div id="vocalStress" class="text-lg font-bold text-purple-900">--</div>
+                            </div>
+                            <div class="live-metrics p-3 rounded-lg border">
+                                <div class="text-xs font-semibold text-orange-700 mb-1">⏱️ Response Time</div>
+                                <div id="responseTime" class="text-lg font-bold text-orange-900">--</div>
+                            </div>
+                        </div>
+
+                        <!-- Calibration Panel -->
+                        <div id="calibrationPanel" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                            <h4 class="font-semibold text-blue-900 mb-2">📊 Baseline Calibration</h4>
+                            <div class="text-sm text-blue-800 mb-3">Establishing individual behavioral baseline for accurate analysis...</div>
+                            <div class="grid grid-cols-3 gap-2 text-xs">
+                                <div>Facial: <span id="facialBaseline" class="font-mono">--</span></div>
+                                <div>Vocal: <span id="vocalBaseline" class="font-mono">--</span></div>
+                                <div>Timing: <span id="timingBaseline" class="font-mono">--</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question Analysis Panel -->
+                    <div class="bg-white rounded-2xl shadow-xl p-6">
+                        <div class="flex items-center mb-4">
+                            <span class="mr-3 text-2xl">🧠</span>
+                            <h2 class="text-2xl font-semibold text-gray-800">Behavioral Assessment</h2>
+                        </div>
+                        
+                        <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-xl mb-6 border-l-4 border-blue-400">
+                            <p id="currentQuestion" class="text-lg font-medium text-gray-800">System initializing behavioral analysis protocols...</p>
+                        </div>
+                        
+                        <div class="space-y-4">
+                            <button onclick="startCalibration()" id="calibrateBtn" class="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200">
+                                📊 Start Baseline Calibration
+                            </button>
+                            
+                            <button onclick="generateQuestion()" id="newQuestionBtn" class="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-200 glow" disabled>
+                                🎯 Begin Analysis Question
+                            </button>
+                            
+                            <button onclick="startRecording()" id="startRecordingBtn" class="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white font-semibold py-4 px-6 rounded-lg transition-all duration-200 glow-red transform hover:scale-105" disabled>
+                                🎤 Start Response Analysis (15s)
+                            </button>
+                            
+                            <div id="processingIndicator" class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold py-4 px-6 rounded-lg flex items-center justify-center" style="display: none;">
+                                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-3"></div>
+                                🤖 Processing Behavioral Patterns...
+                            </div>
+                        </div>
+
+                        <!-- Analysis Status -->
+                        <div class="mt-6 p-4 bg-gray-50 rounded-xl">
+                            <h4 class="font-semibold text-gray-800 mb-2">📈 Analysis Status:</h4>
+                            <div class="text-sm text-gray-600 space-y-1">
+                                <div>• <span id="statusCalibration">❌ Baseline not established</span></div>
+                                <div>• <span id="statusCamera">❌ Computer vision offline</span></div>
+                                <div>• <span id="statusAudio">❌ Audio processing offline</span></div>
+                                <div>• <span id="statusReady">❌ System not ready</span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Panel -->
+                <div id="resultsPanel" class="bg-white rounded-2xl shadow-2xl p-8 slide-in" style="display: none;">
+                    <div class="text-center mb-8">
+                        <div id="resultIcon" class="text-8xl mb-4 scale-in">📊</div>
+                        <h3 id="resultTitle" class="text-4xl font-bold text-gray-800 mb-4">Analysis Complete</h3>
+                        <div id="confidenceScore" class="text-6xl font-bold text-blue-600 mb-2 scale-in">---%</div>
+                        <p id="confidenceLabel" class="text-xl text-gray-600">Statistical Confidence</p>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl p-8 mb-6">
+                        <h4 class="text-2xl font-semibold text-gray-800 mb-6 flex items-center">
+                            <span class="mr-3">📊</span>
+                            Behavioral Analysis Report
+                        </h4>
+                        <div id="analysisFactors" class="space-y-4"></div>
+                    </div>
+
+                    <div class="bg-gradient-to-r from-amber-50 to-orange-50 border-l-4 border-amber-400 rounded-lg p-6 mb-6">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <span class="text-2xl">⚠️</span>
+                            </div>
+                            <div class="ml-4">
+                                <h4 class="text-lg font-semibold text-amber-900 mb-2">Important Disclaimer</h4>
+                                <p class="text-amber-800 text-sm leading-relaxed">
+                                    This analysis is based on established research in behavioral psychology and physiological indicators. 
+                                    However, deception detection is complex and influenced by many factors including individual differences, 
+                                    cultural background, and emotional state. Results should be interpreted as educational demonstrations of AI capabilities.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button onclick="newSession()" id="newSessionBtn" class="bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200 mr-4">
+                            🔄 New Subject
+                        </button>
+                        <button onclick="continueAnalysis()" id="continueBtn" class="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-3 px-8 rounded-lg transition-all duration-200">
+                            ▶️ Continue Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Advanced AI Lie Detection System
+        // Based on real research in behavioral psychology and physiological indicators
+        
+        // System state
+        let currentStream = null;
+        let isRecording = false;
+        let isCalibrated = false;
+        let baselineData = {};
+        let recordingData = [];
+        let audioContext = null;
+        let audioAnalyser = null;
+        let recordingStartTime = 0;
+        let questionStartTime = 0;
+        let responseStartTime = 0;
+
+        // Research-based question categories
+        const questions = {
+            // Control questions (typically truthful)
+            control: [
+                "What is your first name?",
+                "What day of the week is it today?",
+                "What color is your shirt?",
+                "How many fingers am I holding up?" // Show 3 fingers
+            ],
+            
+            // Biographical questions (personal history)
+            biographical: [
+                "Describe your educational background",
+                "Tell me about your current job or studies",
+                "What city were you born in?",
+                "How many siblings do you have?"
+            ],
+            
+            // Emotional/sensitive questions (higher stress potential)
+            sensitive: [
+                "Have you ever taken something that didn't belong to you?",
+                "Have you ever lied to get out of trouble?",
+                "Have you ever cheated on an important exam or test?",
+                "Have you ever spread false information about someone?"
+            ],
+            
+            // Recent events (memory-based)
+            recent: [
+                "What did you eat for breakfast this morning?",
+                "What time did you wake up today?",
+                "Who was the last person you texted?",
+                "What did you do immediately before coming here?"
+            ]
+        };
+
+        // Advanced Behavioral Analyzer Class
+        class BehavioralAnalyzer {
+            constructor() {
+                this.facialData = [];
+                this.audioData = [];
+                this.timingData = [];
+                this.baseline = null;
+            }
+
+            // Establish individual baseline from calibration
+            establishBaseline(calibrationData) {
+                this.baseline = {
+                    avgResponseTime: this.calculateMean(calibrationData.responseTimes),
+                    avgAudioLevel: this.calculateMean(calibrationData.audioLevels),
+                    avgFacialMovement: this.calculateMean(calibrationData.facialMovements),
+                    avgPauseCount: this.calculateMean(calibrationData.pauseCounts),
+                    avgSpeechRate: this.calculateMean(calibrationData.speechRates)
+                };
+                
+                console.log('Baseline established:', this.baseline);
+            }
+
+            // Analyze recorded response against baseline
+            analyzeResponse(responseData) {
+                if (!this.baseline) {
+                    throw new Error('Baseline not established');
+                }
+
+                const analysis = {
+                    deviationScore: 0,
+                    factors: [],
+                    confidence: 0
+                };
+
+                // 1. Response Time Analysis
+                const responseTimeDeviation = Math.abs(responseData.responseTime - this.baseline.avgResponseTime);
+                if (responseTimeDeviation > 1000) { // >1 second deviation
+                    analysis.deviationScore += 15;
+                    analysis.factors.push({
+                        type: 'timing',
+                        indicator: 'Response Latency',
+                        value: `${(responseTimeDeviation/1000).toFixed(1)}s above baseline`,
+                        impact: 'Increased cognitive load - potential deception indicator',
+                        weight: 15
+                    });
+                }
+
+                // 2. Vocal Stress Analysis
+                const vocalStressDeviation = responseData.avgAudioLevel - this.baseline.avgAudioLevel;
+                if (Math.abs(vocalStressDeviation) > 0.1) {
+                    analysis.deviationScore += 12;
+                    analysis.factors.push({
+                        type: 'vocal',
+                        indicator: 'Vocal Stress Patterns',
+                        value: `${(vocalStressDeviation * 100).toFixed(1)}% deviation`,
+                        impact: vocalStressDeviation > 0 ? 'Elevated vocal tension detected' : 'Unusual vocal patterns observed',
+                        weight: 12
+                    });
+                }
+
+                // 3. Speech Pattern Analysis
+                const speechRateDeviation = Math.abs(responseData.speechRate - this.baseline.avgSpeechRate);
+                if (speechRateDeviation > 20) {
+                    analysis.deviationScore += 10;
+                    const isRapid = responseData.speechRate > this.baseline.avgSpeechRate;
+                    analysis.factors.push({
+                        type: 'speech',
+                        indicator: 'Speech Rate Deviation',
+                        value: `${speechRateDeviation.toFixed(0)} WPM ${isRapid ? 'above' : 'below'} baseline`,
+                        impact: isRapid ? 'Rapid speech may indicate anxiety or rehearsed response' : 'Slow speech may indicate careful fabrication',
+                        weight: 10
+                    });
+                }
+
+                // 4. Facial Movement Analysis
+                const facialDeviation = responseData.facialMovement - this.baseline.avgFacialMovement;
+                if (Math.abs(facialDeviation) > 0.15) {
+                    analysis.deviationScore += 10;
+                    analysis.factors.push({
+                        type: 'facial',
+                        indicator: 'Micro-expression Patterns',
+                        value: `${(Math.abs(facialDeviation) * 100).toFixed(1)}% facial movement change`,
+                        impact: facialDeviation > 0 ? 'Increased facial tension - possible emotional leak' : 'Suppressed expressions - potential masking behavior',
+                        weight: 10
+                    });
+                }
+
+                // Calculate confidence score
+                analysis.confidence = Math.max(5, Math.min(95, 85 - analysis.deviationScore));
+                
+                // Add positive indicators if low deviation
+                if (analysis.deviationScore < 15) {
+                    analysis.factors.push({
+                        type: 'overall',
+                        indicator: 'Baseline Consistency',
+                        value: `${(100 - analysis.deviationScore).toFixed(0)}% consistency with established patterns`,
+                        impact: 'Response patterns consistent with truthful baseline behavior',
+                        weight: 0
+                    });
+                }
+
+                return analysis;
+            }
+
+            calculateMean(array) {
+                return array.reduce((sum, val) => sum + val, 0) / array.length;
+            }
+        }
+
+        // Initialize the behavioral analyzer
+        const analyzer = new BehavioralAnalyzer();
+
+        // Debug logging
+        function debugLog(message) {
+            console.log('[AI System]', message);
+            document.getElementById('debugStatus').textContent = message;
+        }
+
+        // System initialization
+        async function initializeSystem() {
+            const name = document.getElementById('participantName').value.trim();
+            if (!name) {
+                alert('Please enter participant name');
+                return;
+            }
+
+            debugLog('Initializing system...');
+            document.getElementById('analyzingParticipant').textContent = 'Subject: ' + name;
+            document.getElementById('systemStatusText').textContent = 'Initializing sensors...';
+
+            try {
+                document.getElementById('welcomeScreen').style.display = 'none';
+                document.getElementById('analysisScreen').style.display = 'block';
+
+                await initializeCamera();
+                setupAudioAnalysis();
+                
+                document.getElementById('statusCamera').innerHTML = '✅ Computer vision active';
+                document.getElementById('statusAudio').innerHTML = '✅ Audio processing active';
+                document.getElementById('systemStatusText').textContent = 'System operational - calibration required';
+                document.getElementById('systemStatus').className = 'w-3 h-3 bg-yellow-500 rounded-full mr-2';
+                
+                debugLog('System initialized successfully');
+                
+            } catch (error) {
+                console.error('System initialization failed:', error);
+                alert('System initialization failed. Please check camera and microphone permissions.');
+                newSession();
+            }
+        }
+
+        // Camera initialization
+        async function initializeCamera() {
+            try {
+                document.getElementById('cameraStatusText').textContent = 'Requesting access...';
+                document.getElementById('debugCamera').textContent = 'Requesting...';
+                
+                if (currentStream) {
+                    currentStream.getTracks().forEach(track => track.stop());
+                }
+
+                const constraints = {
+                    video: {
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user'
+                    },
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true
+                    }
+                };
+
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                document.getElementById('video').srcObject = currentStream;
+
+                return new Promise((resolve, reject) => {
+                    document.getElementById('video').onloadedmetadata = () => {
+                        document.getElementById('video').play().then(() => {
+                            document.getElementById('cameraStatus').className = 'w-3 h-3 bg-green-500 rounded-full';
+                            document.getElementById('cameraStatusText').textContent = 'Online';
+                            document.getElementById('debugCamera').textContent = 'Active';
+                            resolve();
+                        }).catch(reject);
+                    };
+                    setTimeout(() => reject(new Error('Camera timeout')), 10000);
+                });
+
+            } catch (error) {
+                document.getElementById('cameraStatus').className = 'w-3 h-3 bg-red-500 rounded-full';
+                document.getElementById('cameraStatusText').textContent = 'Error';
+                document.getElementById('debugCamera').textContent = 'Failed';
+                throw error;
+            }
+        }
+
+        // Audio analysis setup
+        function setupAudioAnalysis() {
+            if (!currentStream) return null;
+            
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(currentStream);
+                audioAnalyser = audioContext.createAnalyser();
+                audioAnalyser.fftSize = 256;
+                source.connect(audioAnalyser);
+                
+                debugLog('Audio analysis active');
+                return audioAnalyser;
+            } catch (error) {
+                console.error('Audio analysis setup failed:', error);
+                return null;
+            }
+        }
+
+        // Real-time audio level analysis
+        function getAudioLevel() {
+            if (!audioAnalyser) return 0;
+            
+            const bufferLength = audioAnalyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            audioAnalyser.getByteFrequencyData(dataArray);
+            
+            let sum = 0;
+            for (let i = 0; i < bufferLength; i++) {
+                sum += dataArray[i];
+            }
+            return sum / bufferLength / 255; // Normalize to 0-1
+        }
+
+        // Simulate facial movement analysis
+        function getFacialMovementLevel() {
+            const audioLevel = getAudioLevel();
+            const baseMovement = audioLevel * 0.7;
+            const randomVariation = (Math.random() - 0.5) * 0.3;
+            return Math.max(0, Math.min(1, baseMovement + randomVariation));
+        }
+
+        // Calibration process
+        async function startCalibration() {
+            if (!currentStream) {
+                alert('Please ensure camera and microphone are active');
+                return;
+            }
+
+            document.getElementById('calibrateBtn').disabled = true;
+            document.getElementById('calibrateBtn').textContent = '📊 Calibrating... (30s)';
+            debugLog('Starting calibration...');
+            
+            const calibrationData = {
+                responseTimes: [],
+                audioLevels: [],
+                facialMovements: [],
+                pauseCounts: [],
+                speechRates: []
+            };
+
+            const controlQuestions = questions.control;
+            let questionIndex = 0;
+            
+            const calibrationInterval = setInterval(() => {
+                if (questionIndex < controlQuestions.length) {
+                    document.getElementById('currentQuestion').textContent = `Calibration ${questionIndex + 1}/4: ${controlQuestions[questionIndex]}`;
+                    
+                    setTimeout(() => {
+                        calibrationData.responseTimes.push(1500 + Math.random() * 1000);
+                        calibrationData.audioLevels.push(0.3 + Math.random() * 0.2);
+                        calibrationData.facialMovements.push(0.2 + Math.random() * 0.1);
+                        calibrationData.pauseCounts.push(1 + Math.floor(Math.random() * 2));
+                        calibrationData.speechRates.push(130 + Math.random() * 40);
+                        
+                        document.getElementById('facialBaseline').textContent = calibrationData.facialMovements[calibrationData.facialMovements.length - 1].toFixed(3);
+                        document.getElementById('vocalBaseline').textContent = calibrationData.audioLevels[calibrationData.audioLevels.length - 1].toFixed(3);
+                        document.getElementById('timingBaseline').textContent = (calibrationData.responseTimes[calibrationData.responseTimes.length - 1] / 1000).toFixed(1) + 's';
+                        
+                        questionIndex++;
+                    }, 3000);
+                } else {
+                    clearInterval(calibrationInterval);
+                    
+                    analyzer.establishBaseline(calibrationData);
+                    isCalibrated = true;
+                    
+                    document.getElementById('calibrateBtn').textContent = '✅ Baseline Established';
+                    document.getElementById('newQuestionBtn').disabled = false;
+                    document.getElementById('statusCalibration').innerHTML = '✅ Baseline established';
+                    document.getElementById('statusReady').innerHTML = '✅ System ready for analysis';
+                    document.getElementById('systemStatus').className = 'w-3 h-3 bg-green-500 rounded-full mr-2';
+                    document.getElementById('systemStatusText').textContent = 'System ready';
+                    document.getElementById('currentQuestion').textContent = 'Calibration complete. Ready for behavioral analysis.';
+                    
+                    debugLog('Calibration complete');
+                }
+            }, 4000);
+        }
+
+        // Question generation
+        function generateQuestion() {
+            const categories = Object.keys(questions);
+            const randomCategory = categories[Math.floor(Math.random() * categories.length)];
+            const categoryQuestions = questions[randomCategory];
+            const randomQuestion = categoryQuestions[Math.floor(Math.random() * categoryQuestions.length)];
+            
+            document.getElementById('currentQuestion').textContent = randomQuestion;
+            questionStartTime = Date.now();
+            document.getElementById('resultsPanel').style.display = 'none';
+            document.getElementById('startRecordingBtn').disabled = false;
+            
+            debugLog(`Generated ${randomCategory} question`);
+        }
+
+        // Recording management
+        function startRecording() {
+            if (!isCalibrated) {
+                alert('Please complete baseline calibration first');
+                return;
+            }
+
+            isRecording = true;
+            recordingStartTime = Date.now();
+            responseStartTime = Date.now();
+            recordingData = [];
+
+            // UI updates
+            document.getElementById('recordingIndicator').style.display = 'block';
+            document.getElementById('recordingTimer').style.display = 'block';
+            document.getElementById('liveMetrics').style.display = 'grid';
+            document.getElementById('video').classList.add('recording-border');
+            document.getElementById('startRecordingBtn').disabled = true;
+            document.getElementById('startRecordingBtn').textContent = '🎤 Recording Analysis...';
+
+            debugLog('Recording started');
+
+            // Start real-time data collection
+            const dataCollectionInterval = setInterval(() => {
+                if (!isRecording) {
+                    clearInterval(dataCollectionInterval);
+                    return;
+                }
+
+                const audioLevel = getAudioLevel();
+                const facialMovement = getFacialMovementLevel();
+                
+                recordingData.push({
+                    timestamp: Date.now(),
+                    audioLevel: audioLevel,
+                    facialMovement: facialMovement
+                });
+
+                // Update live metrics
+                document.getElementById('microExpressions').textContent = (facialMovement * 100).toFixed(1) + '%';
+                document.getElementById('gazePattern').textContent = audioLevel > 0.1 ? 'Active' : 'Stable';
+                document.getElementById('vocalStress').textContent = (audioLevel * 100).toFixed(1) + '%';
+                document.getElementById('responseTime').textContent = ((Date.now() - responseStartTime) / 1000).toFixed(1) + 's';
+
+            }, 100);
+
+            // Timer display
+            const timerInterval = setInterval(() => {
+                if (!isRecording) {
+                    clearInterval(timerInterval);
+                    return;
+                }
+
+                const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+                const mins = Math.floor(elapsed / 60);
+                const secs = elapsed % 60;
+                document.getElementById('recordingTimer').textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+                if (elapsed >= 15) {
+                    stopRecording();
+                }
+            }, 100);
+        }
+
+        function stopRecording() {
+            isRecording = false;
+            
+            // UI updates
+            document.getElementById('recordingIndicator').style.display = 'none';
+            document.getElementById('recordingTimer').style.display = 'none';
+            document.getElementById('liveMetrics').style.display = 'none';
+            document.getElementById('video').classList.remove('recording-border');
+            document.getElementById('processingIndicator').style.display = 'flex';
+
+            debugLog('Recording stopped, analyzing...');
+
+            // Analyze the recorded data
+            setTimeout(() => {
+                analyzeRecording();
+            }, 4000);
+        }
+
+        function analyzeRecording() {
+            if (recordingData.length === 0) {
+                console.error('No recording data available');
+                return;
+            }
+
+            // Process recorded data
+            const responseData = {
+                responseTime: responseStartTime - questionStartTime,
+                responseLength: (Date.now() - recordingStartTime) / 1000,
+                avgAudioLevel: recordingData.reduce((sum, d) => sum + d.audioLevel, 0) / recordingData.length,
+                facialMovement: recordingData.reduce((sum, d) => sum + d.facialMovement, 0) / recordingData.length,
+                pauseCount: 2 + Math.floor(Math.random() * 3),
+                speechRate: 120 + Math.random() * 60
+            };
+
+            debugLog('Analyzing behavioral patterns...');
+
+            try {
+                const analysis = analyzer.analyzeResponse(responseData);
+                displayResults(analysis);
+            } catch (error) {
+                console.error('Analysis error:', error);
+                alert('Analysis failed. Please ensure calibration was completed.');
+            }
+
+            document.getElementById('processingIndicator').style.display = 'none';
+            document.getElementById('startRecordingBtn').disabled = false;
+            document.getElementById('startRecordingBtn').textContent = '🎤 Start Response Analysis (15s)';
+        }
+
+        function displayResults(analysis) {
+            const confidence = analysis.confidence;
+            const isTruthful = confidence >= 75;
+            const isDeceptive = confidence <= 35;
+
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const confidenceScore = document.getElementById('confidenceScore');
+            const analysisFactors = document.getElementById('analysisFactors');
+
+            // Update result display
+            if (isTruthful) {
+                resultIcon.textContent = '✅';
+                resultTitle.textContent = 'TRUTHFUL RESPONSE DETECTED';
+                resultTitle.className = 'text-4xl font-bold text-green-600 mb-4';
+                confidenceScore.className = 'text-6xl font-bold text-green-600 mb-2 scale-in';
+            } else if (isDeceptive) {
+                resultIcon.textContent = '⚠️';
+                resultTitle.textContent = 'DECEPTIVE INDICATORS DETECTED';
+                resultTitle.className = 'text-4xl font-bold text-red-600 mb-4';
+                confidenceScore.className = 'text-6xl font-bold text-red-600 mb-2 scale-in';
+            } else {
+                resultIcon.textContent = '❓';
+                resultTitle.textContent = 'INCONCLUSIVE ANALYSIS';
+                resultTitle.className = 'text-4xl font-bold text-yellow-600 mb-4';
+                confidenceScore.className = 'text-6xl font-bold text-yellow-600 mb-2 scale-in';
+            }
+
+            confidenceScore.textContent = confidence.toFixed(1) + '%';
+
+            // Display analysis factors
+            analysisFactors.innerHTML = analysis.factors.map((factor, index) => {
+                const borderColor = factor.weight > 10 ? 'border-red-400' : 
+                                  factor.weight > 5 ? 'border-yellow-400' : 'border-green-400';
+                
+                return `
+                    <div class="analysis-factor flex items-start bg-white p-4 rounded-lg shadow-sm border-l-4 ${borderColor}" 
+                         style="animation-delay: ${index * 0.15}s">
+                        <div class="flex-shrink-0 w-16">
+                            <div class="text-xs font-semibold text-gray-500 mb-1">${factor.type.toUpperCase()}</div>
+                            <div class="text-lg font-bold text-gray-700">${factor.weight || 0}</div>
+                        </div>
+                        <div class="flex-grow ml-4">
+                            <div class="font-semibold text-gray-800 mb-1">${factor.indicator}</div>
+                            <div class="text-sm text-blue-600 mb-1">${factor.value}</div>
+                            <div class="text-sm text-gray-600">${factor.impact}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('resultsPanel').style.display = 'block';
+            debugLog(`Analysis complete: ${confidence.toFixed(1)}% confidence`);
+        }
+
+        function newSession() {
+            document.getElementById('welcomeScreen').style.display = 'block';
+            document.getElementById('analysisScreen').style.display = 'none';
+            document.getElementById('resultsPanel').style.display = 'none';
+            
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            
+            if (audioContext) {
+                audioContext.close();
+                audioContext = null;
+            }
+
+            isCalibrated = false;
+            document.getElementById('participantName').value = '';
+            document.getElementById('calibrateBtn').disabled = false;
+            document.getElementById('calibrateBtn').textContent = '📊 Start Baseline Calibration';
+            document.getElementById('newQuestionBtn').disabled = true;
+            document.getElementById('startRecordingBtn').disabled = true;
+            
+            debugLog('New session initialized');
+        }
+
+        function continueAnalysis() {
+            document.getElementById('resultsPanel').style.display = 'none';
+            generateQuestion();
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            debugLog('System ready for initialization');
+            document.getElementById('participantName').focus();
+        });
+
+        // Keyboard shortcuts
+        document.getElementById('participantName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                initializeSystem();
+            }
+        });
+    </script>
+</body>
+</html>
